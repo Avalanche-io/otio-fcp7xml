@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xmeml>
+<xmeml version="5">
+  <sequence>
+    <name>Sample Sequence</name>
+    <duration>240</duration>
+    <rate>
+      <timebase>24</timebase>
+      <ntsc>false</ntsc>
+    </rate>
+    <timecode>
+      <rate>
+        <timebase>0</timebase>
+        <ntsc>false</ntsc>
+      </rate>
+    </timecode>
+    <media>
+      <video>
+        <track>
+          <enabled>true</enabled>
+          <clipitem id="clip-1">
+            <name>Intro Clip</name>
+            <enabled>true</enabled>
+            <duration>120</duration>
+            <rate>
+              <timebase>24</timebase>
+              <ntsc>false</ntsc>
+            </rate>
+            <start>0</start>
+            <end>120</end>
+            <in>0</in>
+            <out>120</out>
+            <file id="file-intromov">
+              <name>intro.mov</name>
+              <pathurl>file:///media/intro.mov</pathurl>
+              <rate>
+                <timebase>24</timebase>
+                <ntsc>false</ntsc>
+              </rate>
+              <duration>240</duration>
+            </file>
+          </clipitem>
+          <clipitem id="clip-2">
+            <name>Main Clip</name>
+            <enabled>true</enabled>
+            <duration>120</duration>
+            <rate>
+              <timebase>24</timebase>
+              <ntsc>false</ntsc>
+            </rate>
+            <start>120</start>
+            <end>240</end>
+            <in>50</in>
+            <out>170</out>
+            <file id="file-mainmov">
+              <name>main.mov</name>
+              <pathurl>file:///media/main.mov</pathurl>
+              <rate>
+                <timebase>24</timebase>
+                <ntsc>false</ntsc>
+              </rate>
+              <duration>300</duration>
+            </file>
+          </clipitem>
+        </track>
+      </video>
+      <audio>
+        <track>
+          <enabled>true</enabled>
+          <clipitem id="clip-3">
+            <name>Audio Clip</name>
+            <enabled>true</enabled>
+            <duration>240</duration>
+            <rate>
+              <timebase>24</timebase>
+              <ntsc>false</ntsc>
+            </rate>
+            <start>0</start>
+            <end>240</end>
+            <in>0</in>
+            <out>240</out>
+            <file id="file-audiowav">
+              <name>audio.wav</name>
+              <pathurl>file:///media/audio.wav</pathurl>
+              <rate>
+                <timebase>24</timebase>
+                <ntsc>false</ntsc>
+              </rate>
+              <duration>480</duration>
+            </file>
+          </clipitem>
+        </track>
+      </audio>
+    </media>
+  </sequence>
+</xmeml>

@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xmeml>
+<xmeml version="5">
+  <sequence>
+    <name>Feature Test Sequence</name>
+    <duration>300</duration>
+    <rate>
+      <timebase>24</timebase>
+      <ntsc>FALSE</ntsc>
+    </rate>
+    <timecode>
+      <rate>
+        <timebase>24</timebase>
+        <ntsc>FALSE</ntsc>
+      </rate>
+      <string>00:00:00:00</string>
+      <frame>0</frame>
+      <displayformat>NDF</displayformat>
+    </timecode>
+    <marker>
+      <name>Sequence Marker</name>
+      <comment>Test sequence marker</comment>
+      <in>50</in>
+      <out>60</out>
+      <color>
+        <red>255</red>
+        <green>0</green>
+        <blue>0</blue>
+      </color>
+    </marker>
+    <media>
+      <video>
+        <track>
+          <clipitem id="clip-1">
+            <name>Test Clip with Markers</name>
+            <enabled>TRUE</enabled>
+            <duration>100</duration>
+            <rate>
+              <timebase>24</timebase>
+              <ntsc>FALSE</ntsc>
+            </rate>
+            <start>0</start>
+            <end>100</end>
+            <in>0</in>
+            <out>100</out>
+            <file id="file-1">
+              <name>test_clip.mov</name>
+              <pathurl>file:///media/test_clip.mov</pathurl>
+              <rate>
+                <timebase>24</timebase>
+                <ntsc>FALSE</ntsc>
+              </rate>
+              <duration>200</duration>
+            </file>
+            <marker>
+              <name>Clip Marker 1</name>
+              <comment>First marker</comment>
+              <in>10</in>
+              <out>20</out>
+              <color>
+                <red>0</red>
+                <green>255</green>
+                <blue>0</blue>
+              </color>
+            </marker>
+            <marker>
+              <name>Clip Marker 2</name>
+              <comment>Second marker</comment>
+              <in>40</in>
+              <out>50</out>
+              <color>
+                <red>0</red>
+                <green>0</green>
+                <blue>255</blue>
+              </color>
+            </marker>
+            <filter>
+              <enabled>TRUE</enabled>
+              <start>0</start>
+              <end>100</end>
+              <effect>
+                <name>Gaussian Blur</name>
+                <effectid>GaussianBlur</effectid>
+                <effecttype>filter</effecttype>
+                <mediatype>video</mediatype>
+                <effectcategory>blur</effectcategory>
+                <parameter>
+                  <parameterid>amount</parameterid>
+                  <name>Amount</name>
+                  <value>5.0</value>
+                </parameter>
+              </effect>
+            </filter>
+            <effect>
+              <name>Color Correction</name>
+              <effectid>ColorCorrect</effectid>
+              <effecttype>filter</effecttype>
+              <mediatype>video</mediatype>
+            </effect>
+          </clipitem>
+          <transitionitem>
+            <name>Cross Dissolve</name>
+            <rate>
+              <timebase>24</timebase>
+              <ntsc>FALSE</ntsc>
+            </rate>
+            <start>100</start>
+            <end>124</end>
+            <alignment>center</alignment>
+            <effect>
+              <name>Cross Dissolve</name>
+              <effectid>CrossDissolve</effectid>
+              <effecttype>transition</effecttype>
+              <mediatype>video</mediatype>
+              <effectcategory>dissolve</effectcategory>
+              <duration>24</duration>
+              <startratio>0.0</startratio>
+              <endratio>1.0</endratio>
+              <reverse>FALSE</reverse>
+            </effect>
+          </transitionitem>
+          <generatoritem>
+            <name>Slug</name>
+            <duration>50</duration>
+            <rate>
+              <timebase>24</timebase>
+              <ntsc>FALSE</ntsc>
+            </rate>
+            <start>124</start>
+            <end>174</end>
+            <in>0</in>
+            <out>50</out>
+            <enabled>TRUE</enabled>
+            <alphatype>none</alphatype>
+            <marker>
+              <name>Generator Marker</name>
+              <comment>Marker on generator</comment>
+              <in>10</in>
+              <out>15</out>
+            </marker>
+          </generatoritem>
+          <clipitem id="clip-2">
+            <name>Image Sequence</name>
+            <enabled>TRUE</enabled>
+            <duration>50</duration>
+            <rate>
+              <timebase>24</timebase>
+              <ntsc>FALSE</ntsc>
+            </rate>
+            <start>174</start>
+            <end>224</end>
+            <in>0</in>
+            <out>50</out>
+            <file id="file-2">
+              <name>frame_####.png</name>
+              <pathurl>file:///media/frames/frame_####.png</pathurl>
+              <rate>
+                <timebase>24</timebase>
+                <ntsc>FALSE</ntsc>
+              </rate>
+              <duration>100</duration>
+            </file>
+          </clipitem>
+        </track>
+      </video>
+      <audio>
+        <track>
+          <clipitem id="audio-1">
+            <name>Audio Clip</name>
+            <enabled>TRUE</enabled>
+            <duration>100</duration>
+            <rate>
+              <timebase>24</timebase>
+              <ntsc>FALSE</ntsc>
+            </rate>
+            <start>0</start>
+            <end>100</end>
+            <in>0</in>
+            <out>100</out>
+            <file id="file-3">
+              <name>audio.wav</name>
+              <pathurl>file:///media/audio.wav</pathurl>
+              <rate>
+                <timebase>24</timebase>
+                <ntsc>FALSE</ntsc>
+              </rate>
+              <duration>200</duration>
+            </file>
+          </clipitem>
+        </track>
+      </audio>
+    </media>
+  </sequence>
+</xmeml>

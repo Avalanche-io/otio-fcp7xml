@@ -9,8 +9,8 @@ import (
 	"log"
 	"strings"
 
-	"github.com/mrjoshuak/gotio/opentime"
-	"github.com/mrjoshuak/gotio/opentimelineio"
+	"github.com/Avalanche-io/gotio/opentime"
+	"github.com/Avalanche-io/gotio/opentimelineio"
 	"github.com/mrjoshuak/otio-fcp7xml"
 )
 

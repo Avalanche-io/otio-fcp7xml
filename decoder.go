@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/mrjoshuak/gotio/opentime"
-	"github.com/mrjoshuak/gotio/opentimelineio"
+	"github.com/Avalanche-io/gotio/opentime"
+	"github.com/Avalanche-io/gotio/opentimelineio"
 )
 
 // Decoder decodes Final Cut Pro 7 XML into OTIO Timeline.

@@ -10,8 +10,8 @@ import (
 	"net/url"
 	"path/filepath"
 
-	"github.com/mrjoshuak/gotio/opentime"
-	"github.com/mrjoshuak/gotio/opentimelineio"
+	"github.com/Avalanche-io/gotio/opentime"
+	"github.com/Avalanche-io/gotio/opentimelineio"
 )
 
 // Encoder encodes OTIO Timeline into Final Cut Pro 7 XML.

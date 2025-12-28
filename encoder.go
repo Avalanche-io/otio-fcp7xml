@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 
 	"github.com/Avalanche-io/gotio/opentime"
-	"github.com/Avalanche-io/gotio/opentimelineio"
+	"github.com/Avalanche-io/gotio"
 )
 
 // Encoder encodes OTIO Timeline into Final Cut Pro 7 XML.
@@ -25,7 +25,7 @@ func NewEncoder(w io.Writer) *Encoder {
 }
 
 // Encode converts an OTIO Timeline to FCP7 XML and writes it.
-func (e *Encoder) Encode(timeline *opentimelineio.Timeline) error {
+func (e *Encoder) Encode(timeline *gotio.Timeline) error {
 	if timeline == nil {
 		return fmt.Errorf("timeline cannot be nil")
 	}
@@ -60,16 +60,16 @@ func (e *Encoder) Encode(timeline *opentimelineio.Timeline) error {
 }
 
 // convertTimeline converts an OTIO Timeline to FCP7 XMEML.
-func (e *Encoder) convertTimeline(timeline *opentimelineio.Timeline) (*XMEML, error) {
+func (e *Encoder) convertTimeline(timeline *gotio.Timeline) (*XMEML, error) {
 	// Determine the frame rate from the first track
 	frameRate := 24.0 // default
 	isNTSC := false
 
 	if timeline.Tracks() != nil && len(timeline.Tracks().Children()) > 0 {
 		for _, child := range timeline.Tracks().Children() {
-			if track, ok := child.(*opentimelineio.Track); ok {
+			if track, ok := child.(*gotio.Track); ok {
 				if len(track.Children()) > 0 {
-					if clip, ok := track.Children()[0].(*opentimelineio.Clip); ok {
+					if clip, ok := track.Children()[0].(*gotio.Clip); ok {
 						dur, err := clip.Duration()
 						if err == nil && dur.Rate() > 0 {
 							frameRate = dur.Rate()
@@ -96,7 +96,7 @@ func (e *Encoder) convertTimeline(timeline *opentimelineio.Timeline) (*XMEML, er
 }
 
 // convertTracks converts OTIO tracks to an FCP7 Sequence.
-func (e *Encoder) convertTracks(timeline *opentimelineio.Timeline, frameRate float64, isNTSC bool) (*Sequence, error) {
+func (e *Encoder) convertTracks(timeline *gotio.Timeline, frameRate float64, isNTSC bool) (*Sequence, error) {
 	timebase := int(frameRate)
 	if isNTSC {
 		// Round up for NTSC rates (e.g., 29.97 -> 30)
@@ -152,7 +152,7 @@ func (e *Encoder) convertTracks(timeline *opentimelineio.Timeline, frameRate flo
 }
 
 // convertTrack converts an OTIO Track to an FCP7 Track.
-func (e *Encoder) convertTrack(track *opentimelineio.Track, rate *Rate) (*Track, error) {
+func (e *Encoder) convertTrack(track *gotio.Track, rate *Rate) (*Track, error) {
 	fcpTrack := &Track{
 		ClipItem:       make([]ClipItem, 0),
 		TransitionItem: make([]TransitionItem, 0),
@@ -169,7 +169,7 @@ func (e *Encoder) convertTrack(track *opentimelineio.Track, rate *Rate) (*Track,
 	// Convert each child
 	for _, child := range track.Children() {
 		switch item := child.(type) {
-		case *opentimelineio.Clip:
+		case *gotio.Clip:
 			// Check if it's a generator
 			if isGenerator, genItem := e.convertToGenerator(item, rate, currentPosition); isGenerator {
 				fcpTrack.GeneratorItem = append(fcpTrack.GeneratorItem, *genItem)
@@ -188,7 +188,7 @@ func (e *Encoder) convertTrack(track *opentimelineio.Track, rate *Rate) (*Track,
 			}
 			currentPosition += int64(dur.Value())
 
-		case *opentimelineio.Transition:
+		case *gotio.Transition:
 			transItem, err := e.convertTransitionToItem(item, rate, currentPosition)
 			if err != nil {
 				return nil, fmt.Errorf("failed to convert transition: %w", err)
@@ -199,7 +199,7 @@ func (e *Encoder) convertTrack(track *opentimelineio.Track, rate *Rate) (*Track,
 			dur := item.InOffset().Add(item.OutOffset())
 			currentPosition += int64(dur.Value())
 
-		case *opentimelineio.Gap:
+		case *gotio.Gap:
 			// Gaps represent empty space in the timeline
 			// In FCP7, we can skip them or represent them differently
 			dur, err := item.Duration()
@@ -218,7 +218,7 @@ func (e *Encoder) convertTrack(track *opentimelineio.Track, rate *Rate) (*Track,
 }
 
 // convertClip converts an OTIO Clip to an FCP7 ClipItem.
-func (e *Encoder) convertClip(clip *opentimelineio.Clip, rate *Rate, startPosition int64) (*ClipItem, error) {
+func (e *Encoder) convertClip(clip *gotio.Clip, rate *Rate, startPosition int64) (*ClipItem, error) {
 	// Get source range
 	var sourceRange opentime.TimeRange
 	if clip.SourceRange() != nil {
@@ -258,12 +258,12 @@ func (e *Encoder) convertClip(clip *opentimelineio.Clip, rate *Rate, startPositi
 		}
 
 		// Restore effects from metadata
-		if effects, ok := metadata["fcp7xml_effects"].([]opentimelineio.AnyDictionary); ok {
+		if effects, ok := metadata["fcp7xml_effects"].([]gotio.AnyDictionary); ok {
 			clipItem.Effect = e.metadataToEffects(effects)
 		}
 
 		// Restore filters from metadata
-		if filters, ok := metadata["fcp7xml_filters"].([]opentimelineio.AnyDictionary); ok {
+		if filters, ok := metadata["fcp7xml_filters"].([]gotio.AnyDictionary); ok {
 			clipItem.Filter = e.metadataToFilters(filters)
 		}
 	}
@@ -288,7 +288,7 @@ func (e *Encoder) convertClip(clip *opentimelineio.Clip, rate *Rate, startPositi
 }
 
 // convertMediaReference converts an OTIO MediaReference to an FCP7 File.
-func (e *Encoder) convertMediaReference(ref opentimelineio.MediaReference, rate *Rate) (*File, error) {
+func (e *Encoder) convertMediaReference(ref gotio.MediaReference, rate *Rate) (*File, error) {
 	// Generate a file ID based on the reference name
 	fileID := "file-" + sanitizeID(ref.Name())
 
@@ -300,7 +300,7 @@ func (e *Encoder) convertMediaReference(ref opentimelineio.MediaReference, rate 
 
 	// Handle different types of references
 	switch r := ref.(type) {
-	case *opentimelineio.ExternalReference:
+	case *gotio.ExternalReference:
 		// Convert URL
 		targetURL := r.TargetURL()
 		if targetURL != "" {
@@ -324,7 +324,7 @@ func (e *Encoder) convertMediaReference(ref opentimelineio.MediaReference, rate 
 			file.Duration = int64(ar.Duration().Value())
 		}
 
-	case *opentimelineio.MissingReference:
+	case *gotio.MissingReference:
 		// Missing reference - no path URL
 		file.PathURL = ""
 
@@ -388,7 +388,7 @@ func isFileURL(s string) bool {
 }
 
 // convertToGenerator checks if a clip is a generator and converts it.
-func (e *Encoder) convertToGenerator(clip *opentimelineio.Clip, rate *Rate, startPosition int64) (bool, *GeneratorItem) {
+func (e *Encoder) convertToGenerator(clip *gotio.Clip, rate *Rate, startPosition int64) (bool, *GeneratorItem) {
 	metadata := clip.Metadata()
 	if metadata == nil {
 		return false, nil
@@ -430,12 +430,12 @@ func (e *Encoder) convertToGenerator(clip *opentimelineio.Clip, rate *Rate, star
 	genItem.Enabled = &enabled
 
 	// Restore effect from metadata
-	if effectMeta, ok := metadata["fcp7xml_effect"].(opentimelineio.AnyDictionary); ok {
+	if effectMeta, ok := metadata["fcp7xml_effect"].(gotio.AnyDictionary); ok {
 		genItem.Effect = e.metadataToEffect(effectMeta)
 	}
 
 	// Restore filters from metadata
-	if filters, ok := metadata["fcp7xml_filters"].([]opentimelineio.AnyDictionary); ok {
+	if filters, ok := metadata["fcp7xml_filters"].([]gotio.AnyDictionary); ok {
 		genItem.Filter = e.metadataToFilters(filters)
 	}
 
@@ -449,7 +449,7 @@ func (e *Encoder) convertToGenerator(clip *opentimelineio.Clip, rate *Rate, star
 }
 
 // convertTransitionToItem converts an OTIO Transition to FCP7 TransitionItem.
-func (e *Encoder) convertTransitionToItem(trans *opentimelineio.Transition, rate *Rate, startPosition int64) (*TransitionItem, error) {
+func (e *Encoder) convertTransitionToItem(trans *gotio.Transition, rate *Rate, startPosition int64) (*TransitionItem, error) {
 	duration := trans.InOffset().Add(trans.OutOffset())
 	durationFrames := int64(duration.Value())
 
@@ -468,7 +468,7 @@ func (e *Encoder) convertTransitionToItem(trans *opentimelineio.Transition, rate
 		}
 
 		// Restore effect from metadata
-		if effectMeta, ok := metadata["fcp7xml_effect"].(opentimelineio.AnyDictionary); ok {
+		if effectMeta, ok := metadata["fcp7xml_effect"].(gotio.AnyDictionary); ok {
 			transItem.Effect = e.metadataToEffect(effectMeta)
 		}
 	}
@@ -477,7 +477,7 @@ func (e *Encoder) convertTransitionToItem(trans *opentimelineio.Transition, rate
 }
 
 // convertMarkerToFCP converts an OTIO Marker to FCP7 Marker.
-func (e *Encoder) convertMarkerToFCP(marker *opentimelineio.Marker) Marker {
+func (e *Encoder) convertMarkerToFCP(marker *gotio.Marker) Marker {
 	markedRange := marker.MarkedRange()
 	inPoint := int64(markedRange.StartTime().Value())
 	outPoint := inPoint + int64(markedRange.Duration().Value())
@@ -505,7 +505,7 @@ func (e *Encoder) convertMarkerToFCP(marker *opentimelineio.Marker) Marker {
 }
 
 // metadataToEffect converts metadata dictionary to Effect.
-func (e *Encoder) metadataToEffect(metadata opentimelineio.AnyDictionary) *Effect {
+func (e *Encoder) metadataToEffect(metadata gotio.AnyDictionary) *Effect {
 	effect := &Effect{}
 
 	if name, ok := metadata["name"].(string); ok {
@@ -537,7 +537,7 @@ func (e *Encoder) metadataToEffect(metadata opentimelineio.AnyDictionary) *Effec
 	}
 
 	// Convert parameters
-	if params, ok := metadata["parameters"].([]opentimelineio.AnyDictionary); ok {
+	if params, ok := metadata["parameters"].([]gotio.AnyDictionary); ok {
 		for _, paramMeta := range params {
 			param := e.metadataToParameter(paramMeta)
 			effect.Parameter = append(effect.Parameter, param)
@@ -548,7 +548,7 @@ func (e *Encoder) metadataToEffect(metadata opentimelineio.AnyDictionary) *Effec
 }
 
 // metadataToEffects converts metadata array to Effects array.
-func (e *Encoder) metadataToEffects(metadataArray []opentimelineio.AnyDictionary) []Effect {
+func (e *Encoder) metadataToEffects(metadataArray []gotio.AnyDictionary) []Effect {
 	effects := make([]Effect, len(metadataArray))
 	for i, meta := range metadataArray {
 		effects[i] = *e.metadataToEffect(meta)
@@ -557,7 +557,7 @@ func (e *Encoder) metadataToEffects(metadataArray []opentimelineio.AnyDictionary
 }
 
 // metadataToFilters converts metadata array to Filters array.
-func (e *Encoder) metadataToFilters(metadataArray []opentimelineio.AnyDictionary) []Filter {
+func (e *Encoder) metadataToFilters(metadataArray []gotio.AnyDictionary) []Filter {
 	filters := make([]Filter, len(metadataArray))
 	for i, meta := range metadataArray {
 		filter := Filter{}
@@ -571,7 +571,7 @@ func (e *Encoder) metadataToFilters(metadataArray []opentimelineio.AnyDictionary
 		if end, ok := meta["end"].(int64); ok {
 			filter.End = end
 		}
-		if effectMeta, ok := meta["effect"].(opentimelineio.AnyDictionary); ok {
+		if effectMeta, ok := meta["effect"].(gotio.AnyDictionary); ok {
 			filter.Effect = e.metadataToEffect(effectMeta)
 		}
 
@@ -581,7 +581,7 @@ func (e *Encoder) metadataToFilters(metadataArray []opentimelineio.AnyDictionary
 }
 
 // metadataToParameter converts metadata dictionary to Parameter.
-func (e *Encoder) metadataToParameter(metadata opentimelineio.AnyDictionary) Parameter {
+func (e *Encoder) metadataToParameter(metadata gotio.AnyDictionary) Parameter {
 	param := Parameter{}
 
 	if paramID, ok := metadata["parameterid"].(string); ok {

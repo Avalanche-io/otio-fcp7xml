@@ -10,8 +10,8 @@ import (
 	"strings"
 
 	"github.com/Avalanche-io/gotio/opentime"
-	"github.com/Avalanche-io/gotio/opentimelineio"
-	"github.com/mrjoshuak/otio-fcp7xml"
+	"github.com/Avalanche-io/gotio"
+	"github.com/Avalanche-io/otio-fcp7xml"
 )
 
 // ExampleDecoder demonstrates how to decode FCP7 XML into an OTIO Timeline.
@@ -64,7 +64,7 @@ func ExampleDecoder() {
 		fmt.Printf("Clips in track: %d\n", len(track.Children()))
 
 		if len(track.Children()) > 0 {
-			if clip, ok := track.Children()[0].(*opentimelineio.Clip); ok {
+			if clip, ok := track.Children()[0].(*gotio.Clip); ok {
 				fmt.Printf("First clip: %s\n", clip.Name())
 			}
 		}
@@ -80,13 +80,13 @@ func ExampleDecoder() {
 // ExampleEncoder demonstrates how to encode an OTIO Timeline to FCP7 XML.
 func ExampleEncoder() {
 	// Create a timeline
-	timeline := opentimelineio.NewTimeline("My Timeline", nil, nil)
+	timeline := gotio.NewTimeline("My Timeline", nil, nil)
 
 	// Create a video track
-	videoTrack := opentimelineio.NewTrack("V1", nil, opentimelineio.TrackKindVideo, nil, nil)
+	videoTrack := gotio.NewTrack("V1", nil, gotio.TrackKindVideo, nil, nil)
 
 	// Create a clip with a media reference
-	mediaRef := opentimelineio.NewExternalReference(
+	mediaRef := gotio.NewExternalReference(
 		"video.mov",
 		"file:///path/to/video.mov",
 		nil,
@@ -98,7 +98,7 @@ func ExampleEncoder() {
 		opentime.NewRationalTime(100, 24),
 	)
 
-	clip := opentimelineio.NewClip(
+	clip := gotio.NewClip(
 		"My Clip",
 		mediaRef,
 		&sourceRange,
@@ -138,17 +138,17 @@ func ExampleEncoder() {
 // ExampleEncoder_roundTrip demonstrates encoding and decoding a timeline.
 func ExampleEncoder_roundTrip() {
 	// Create a timeline
-	original := opentimelineio.NewTimeline("Round Trip", nil, nil)
-	videoTrack := opentimelineio.NewTrack("V1", nil, opentimelineio.TrackKindVideo, nil, nil)
+	original := gotio.NewTimeline("Round Trip", nil, nil)
+	videoTrack := gotio.NewTrack("V1", nil, gotio.TrackKindVideo, nil, nil)
 
 	sourceRange := opentime.NewTimeRange(
 		opentime.NewRationalTime(0, 24),
 		opentime.NewRationalTime(50, 24),
 	)
 
-	clip := opentimelineio.NewClip(
+	clip := gotio.NewClip(
 		"Test Clip",
-		opentimelineio.NewMissingReference("", nil, nil),
+		gotio.NewMissingReference("", nil, nil),
 		&sourceRange,
 		nil,
 		nil,

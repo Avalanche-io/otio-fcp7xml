@@ -9,7 +9,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/mrjoshuak/otio-fcp7xml"
+	"github.com/Avalanche-io/otio-fcp7xml"
 )
 
 func main() {

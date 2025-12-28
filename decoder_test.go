@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Avalanche-io/gotio/opentimelineio"
+	"github.com/Avalanche-io/gotio"
 )
 
 func TestDecoder_Decode(t *testing.T) {
@@ -94,7 +94,7 @@ func TestDecoder_Decode(t *testing.T) {
 		}
 
 		if len(videoTrack.Children()) > 0 {
-			clip, ok := videoTrack.Children()[0].(*opentimelineio.Clip)
+			clip, ok := videoTrack.Children()[0].(*gotio.Clip)
 			if !ok {
 				t.Error("First child is not a Clip")
 			} else {
@@ -107,7 +107,7 @@ func TestDecoder_Decode(t *testing.T) {
 				if mediaRef == nil {
 					t.Error("Clip has no media reference")
 				} else {
-					if extRef, ok := mediaRef.(*opentimelineio.ExternalReference); ok {
+					if extRef, ok := mediaRef.(*gotio.ExternalReference); ok {
 						if extRef.TargetURL() != "file:///path/to/test.mov" {
 							t.Errorf("Expected URL 'file:///path/to/test.mov', got '%s'", extRef.TargetURL())
 						}
@@ -176,7 +176,7 @@ func TestDecoder_DecodeNTSC(t *testing.T) {
 
 	videoTracks := timeline.VideoTracks()
 	if len(videoTracks) > 0 && len(videoTracks[0].Children()) > 0 {
-		clip, ok := videoTracks[0].Children()[0].(*opentimelineio.Clip)
+		clip, ok := videoTracks[0].Children()[0].(*gotio.Clip)
 		if !ok {
 			t.Fatal("First child is not a Clip")
 		}

@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/Avalanche-io/gotio/opentimelineio"
+	"github.com/Avalanche-io/gotio"
 )
 
 func TestDecoder_DecodeWithMarkers(t *testing.T) {
@@ -37,7 +37,7 @@ func TestDecoder_DecodeWithMarkers(t *testing.T) {
 		t.Fatalf("Expected at least 1 item in track")
 	}
 
-	clip, ok := children[0].(*opentimelineio.Clip)
+	clip, ok := children[0].(*gotio.Clip)
 	if !ok {
 		t.Fatalf("Expected first item to be a Clip")
 	}
@@ -82,7 +82,7 @@ func TestDecoder_DecodeWithEffectsAndFilters(t *testing.T) {
 
 	videoTracks := timeline.VideoTracks()
 	track := videoTracks[0]
-	clip := track.Children()[0].(*opentimelineio.Clip)
+	clip := track.Children()[0].(*gotio.Clip)
 
 	metadata := clip.Metadata()
 	if metadata == nil {
@@ -94,7 +94,7 @@ func TestDecoder_DecodeWithEffectsAndFilters(t *testing.T) {
 	if !ok {
 		t.Error("Expected fcp7xml_effects in metadata")
 	} else {
-		effectsArray, ok := effects.([]opentimelineio.AnyDictionary)
+		effectsArray, ok := effects.([]gotio.AnyDictionary)
 		if !ok || len(effectsArray) != 1 {
 			t.Errorf("Expected 1 effect, got %d", len(effectsArray))
 		}
@@ -105,7 +105,7 @@ func TestDecoder_DecodeWithEffectsAndFilters(t *testing.T) {
 	if !ok {
 		t.Error("Expected fcp7xml_filters in metadata")
 	} else {
-		filtersArray, ok := filters.([]opentimelineio.AnyDictionary)
+		filtersArray, ok := filters.([]gotio.AnyDictionary)
 		if !ok || len(filtersArray) != 1 {
 			t.Errorf("Expected 1 filter, got %d", len(filtersArray))
 		}
@@ -134,7 +134,7 @@ func TestDecoder_DecodeWithTransition(t *testing.T) {
 		t.Fatalf("Expected at least 2 items in track")
 	}
 
-	transition, ok := children[1].(*opentimelineio.Transition)
+	transition, ok := children[1].(*gotio.Transition)
 	if !ok {
 		t.Fatalf("Expected second item to be a Transition, got %T", children[1])
 	}
@@ -177,7 +177,7 @@ func TestDecoder_DecodeWithGenerator(t *testing.T) {
 		t.Fatalf("Expected at least 3 items in track")
 	}
 
-	clip, ok := children[2].(*opentimelineio.Clip)
+	clip, ok := children[2].(*gotio.Clip)
 	if !ok {
 		t.Fatalf("Expected third item to be a Clip (generator), got %T", children[2])
 	}
@@ -209,7 +209,7 @@ func TestDecoder_DecodeWithGenerator(t *testing.T) {
 
 	// Check media reference is GeneratorReference
 	mediaRef := clip.MediaReference()
-	if _, ok := mediaRef.(*opentimelineio.GeneratorReference); !ok {
+	if _, ok := mediaRef.(*gotio.GeneratorReference); !ok {
 		t.Errorf("Expected GeneratorReference, got %T", mediaRef)
 	}
 }
@@ -236,7 +236,7 @@ func TestDecoder_DecodeWithImageSequence(t *testing.T) {
 		t.Fatalf("Expected at least 4 items in track")
 	}
 
-	clip, ok := children[3].(*opentimelineio.Clip)
+	clip, ok := children[3].(*gotio.Clip)
 	if !ok {
 		t.Fatalf("Expected fourth item to be a Clip, got %T", children[3])
 	}
@@ -247,7 +247,7 @@ func TestDecoder_DecodeWithImageSequence(t *testing.T) {
 
 	// Check media reference is ImageSequenceReference
 	mediaRef := clip.MediaReference()
-	imgSeqRef, ok := mediaRef.(*opentimelineio.ImageSequenceReference)
+	imgSeqRef, ok := mediaRef.(*gotio.ImageSequenceReference)
 	if !ok {
 		t.Fatalf("Expected ImageSequenceReference, got %T", mediaRef)
 	}
@@ -305,7 +305,7 @@ func TestEncoder_EncodeWithNewFeatures(t *testing.T) {
 	}
 
 	track := videoTracks[0]
-	clip := track.Children()[0].(*opentimelineio.Clip)
+	clip := track.Children()[0].(*gotio.Clip)
 	markers := clip.Markers()
 
 	if len(markers) != 2 {

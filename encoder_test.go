@@ -10,18 +10,18 @@ import (
 	"testing"
 
 	"github.com/Avalanche-io/gotio/opentime"
-	"github.com/Avalanche-io/gotio/opentimelineio"
+	"github.com/Avalanche-io/gotio"
 )
 
 func TestEncoder_Encode(t *testing.T) {
 	// Create a simple timeline
-	timeline := opentimelineio.NewTimeline("Test Timeline", nil, nil)
+	timeline := gotio.NewTimeline("Test Timeline", nil, nil)
 
 	// Create a video track
-	videoTrack := opentimelineio.NewTrack("Video 1", nil, opentimelineio.TrackKindVideo, nil, nil)
+	videoTrack := gotio.NewTrack("Video 1", nil, gotio.TrackKindVideo, nil, nil)
 
 	// Create a clip
-	mediaRef := opentimelineio.NewExternalReference(
+	mediaRef := gotio.NewExternalReference(
 		"test.mov",
 		"file:///path/to/test.mov",
 		&opentime.TimeRange{},
@@ -31,7 +31,7 @@ func TestEncoder_Encode(t *testing.T) {
 		opentime.NewRationalTime(0, 24),
 		opentime.NewRationalTime(50, 24),
 	)
-	clip := opentimelineio.NewClip(
+	clip := gotio.NewClip(
 		"Test Clip",
 		mediaRef,
 		&sourceRange,
@@ -122,19 +122,19 @@ func TestEncoder_Encode(t *testing.T) {
 
 func TestEncoder_EncodeRoundTrip(t *testing.T) {
 	// Create a timeline, encode it, then decode it back
-	timeline := opentimelineio.NewTimeline("Round Trip Test", nil, nil)
+	timeline := gotio.NewTimeline("Round Trip Test", nil, nil)
 
-	videoTrack := opentimelineio.NewTrack("Video 1", nil, opentimelineio.TrackKindVideo, nil, nil)
-	audioTrack := opentimelineio.NewTrack("Audio 1", nil, opentimelineio.TrackKindAudio, nil, nil)
+	videoTrack := gotio.NewTrack("Video 1", nil, gotio.TrackKindVideo, nil, nil)
+	audioTrack := gotio.NewTrack("Audio 1", nil, gotio.TrackKindAudio, nil, nil)
 
 	// Add video clip
 	videoSourceRange := opentime.NewTimeRange(
 		opentime.NewRationalTime(0, 24),
 		opentime.NewRationalTime(100, 24),
 	)
-	videoClip := opentimelineio.NewClip(
+	videoClip := gotio.NewClip(
 		"Video Clip",
-		opentimelineio.NewExternalReference("video.mov", "file:///video.mov", nil, nil),
+		gotio.NewExternalReference("video.mov", "file:///video.mov", nil, nil),
 		&videoSourceRange,
 		nil,
 		nil,
@@ -149,9 +149,9 @@ func TestEncoder_EncodeRoundTrip(t *testing.T) {
 		opentime.NewRationalTime(0, 24),
 		opentime.NewRationalTime(100, 24),
 	)
-	audioClip := opentimelineio.NewClip(
+	audioClip := gotio.NewClip(
 		"Audio Clip",
-		opentimelineio.NewExternalReference("audio.wav", "file:///audio.wav", nil, nil),
+		gotio.NewExternalReference("audio.wav", "file:///audio.wav", nil, nil),
 		&audioSourceRange,
 		nil,
 		nil,
@@ -195,14 +195,14 @@ func TestEncoder_EncodeRoundTrip(t *testing.T) {
 	}
 
 	if len(videoTracks) > 0 && len(videoTracks[0].Children()) > 0 {
-		clip := videoTracks[0].Children()[0].(*opentimelineio.Clip)
+		clip := videoTracks[0].Children()[0].(*gotio.Clip)
 		if clip.Name() != "Video Clip" {
 			t.Errorf("Expected clip name 'Video Clip', got '%s'", clip.Name())
 		}
 	}
 
 	if len(audioTracks) > 0 && len(audioTracks[0].Children()) > 0 {
-		clip := audioTracks[0].Children()[0].(*opentimelineio.Clip)
+		clip := audioTracks[0].Children()[0].(*gotio.Clip)
 		if clip.Name() != "Audio Clip" {
 			t.Errorf("Expected clip name 'Audio Clip', got '%s'", clip.Name())
 		}
@@ -211,8 +211,8 @@ func TestEncoder_EncodeRoundTrip(t *testing.T) {
 
 func TestEncoder_EncodeNTSC(t *testing.T) {
 	// Create a timeline with NTSC frame rate (29.97)
-	timeline := opentimelineio.NewTimeline("NTSC Timeline", nil, nil)
-	videoTrack := opentimelineio.NewTrack("Video 1", nil, opentimelineio.TrackKindVideo, nil, nil)
+	timeline := gotio.NewTimeline("NTSC Timeline", nil, nil)
+	videoTrack := gotio.NewTrack("Video 1", nil, gotio.TrackKindVideo, nil, nil)
 
 	// NTSC frame rate: 30000/1001
 	ntscRate := 30.0 * 1000.0 / 1001.0
@@ -221,9 +221,9 @@ func TestEncoder_EncodeNTSC(t *testing.T) {
 		opentime.NewRationalTime(0, ntscRate),
 		opentime.NewRationalTime(30, ntscRate),
 	)
-	clip := opentimelineio.NewClip(
+	clip := gotio.NewClip(
 		"NTSC Clip",
-		opentimelineio.NewMissingReference("", nil, nil),
+		gotio.NewMissingReference("", nil, nil),
 		&sourceRange,
 		nil,
 		nil,
@@ -270,7 +270,7 @@ func TestEncoder_EncodeNilTimeline(t *testing.T) {
 }
 
 func TestEncoder_EncodeEmptyTimeline(t *testing.T) {
-	timeline := opentimelineio.NewTimeline("Empty Timeline", nil, nil)
+	timeline := gotio.NewTimeline("Empty Timeline", nil, nil)
 
 	var buf bytes.Buffer
 	encoder := NewEncoder(&buf)
@@ -293,17 +293,17 @@ func TestEncoder_EncodeEmptyTimeline(t *testing.T) {
 }
 
 func TestEncoder_EncodeWithGaps(t *testing.T) {
-	timeline := opentimelineio.NewTimeline("Timeline with Gaps", nil, nil)
-	videoTrack := opentimelineio.NewTrack("Video 1", nil, opentimelineio.TrackKindVideo, nil, nil)
+	timeline := gotio.NewTimeline("Timeline with Gaps", nil, nil)
+	videoTrack := gotio.NewTrack("Video 1", nil, gotio.TrackKindVideo, nil, nil)
 
 	// Add clip, gap, clip
 	clip1SourceRange := opentime.NewTimeRange(
 		opentime.NewRationalTime(0, 24),
 		opentime.NewRationalTime(50, 24),
 	)
-	clip1 := opentimelineio.NewClip(
+	clip1 := gotio.NewClip(
 		"Clip 1",
-		opentimelineio.NewMissingReference("", nil, nil),
+		gotio.NewMissingReference("", nil, nil),
 		&clip1SourceRange,
 		nil,
 		nil,
@@ -312,15 +312,15 @@ func TestEncoder_EncodeWithGaps(t *testing.T) {
 		nil,
 	)
 
-	gap := opentimelineio.NewGapWithDuration(opentime.NewRationalTime(25, 24))
+	gap := gotio.NewGapWithDuration(opentime.NewRationalTime(25, 24))
 
 	clip2SourceRange := opentime.NewTimeRange(
 		opentime.NewRationalTime(0, 24),
 		opentime.NewRationalTime(50, 24),
 	)
-	clip2 := opentimelineio.NewClip(
+	clip2 := gotio.NewClip(
 		"Clip 2",
-		opentimelineio.NewMissingReference("", nil, nil),
+		gotio.NewMissingReference("", nil, nil),
 		&clip2SourceRange,
 		nil,
 		nil,
